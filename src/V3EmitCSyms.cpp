@@ -331,7 +331,7 @@ class EmitCSyms final : EmitCBaseVisitor {
     virtual void visit(AstVar* nodep) override {
         nameCheck(nodep);
         iterateChildren(nodep);
-        if (nodep->isSigUserRdPublic()) { m_modVars.emplace_back(make_pair(m_modp, nodep)); }
+        if (nodep->isSigUserRdPublic() && !m_cfuncp) { m_modVars.emplace_back(make_pair(m_modp, nodep)); }
     }
     virtual void visit(AstCoverDecl* nodep) override {
         // Assign numbers to all bins, so we know how big of an array to use
