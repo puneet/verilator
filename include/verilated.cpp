@@ -33,6 +33,7 @@
 #include <sys/stat.h>  // mkdir
 #include <list>
 #include <utility>
+#include <limits>
 
 // clang-format off
 #if defined(_WIN32) || defined(__MINGW32__)
