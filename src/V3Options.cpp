@@ -1329,8 +1329,8 @@ void V3Options::parseOptsList(FileLine* fl, const string& optdir, int argc,
         fl->v3warn(DEPRECATED, "Option '--no-clk' is deprecated and has no effect.");
     });
     DECL_OPTION("-euvm", CbCall, [this]() {
-	m_outFormatOk = true;
-	m_euvm = true;
+        m_outFormatOk = true;
+        m_euvm = true;
     });
     DECL_OPTION("-comp-limit-blocks", Set, &m_compLimitBlocks).undocumented();
     DECL_OPTION("-comp-limit-members", Set,
