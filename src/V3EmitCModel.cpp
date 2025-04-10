@@ -833,6 +833,32 @@ class EmitCModel final : public EmitCFunc {
         VL_DO_CLEAR(delete m_ofp, m_ofp = nullptr);
     }
 
+    void emitEuvmMkFile(AstNodeModule* modp) {
+        UASSERT(!m_ofp, "Output file should not be open");
+        const string filename = "obj_dir/D" + topClassName() + ".mk";
+        newCFile(filename, /* slow: */ false, /* source: */ false);
+        m_ofp = new V3OutCFile(filename);
+        puts("EUVMBINDIR = $(dir $(shell which ldc2))\n\n");
+        puts("D" + topClassName() + ".a: verilated_d.o verilated_vcd_d.o euvm_trace.o \\\n\t");
+        puts("verilated.o verilated_vcd_c.o verilated_threads.o \\\n\t");
+        puts(topClassName() + "_euvm_funcs.o " + topClassName() + "_euvm.o " +
+	     topClassName() + "__ALL.a\n\n");
+	puts(topClassName() + "_euvm.o: ../euvm_dir/" +
+	     topClassName() + "_euvm.d\n\t");
+	puts("ldc2 -c -O3 -w $^ -of$@\n\n");
+	puts("euvm_trace.o: $(EUVMBINDIR)/../import/esdl/intf/verilator/trace.d\n\t");
+	puts("ldc2 -c -O3 -w $^ -of$@\n\n");
+	puts(topClassName() + "_euvm_funcs.o: ../euvm_dir/" +
+	     topClassName() + "_euvm_funcs.cpp\n\t");
+	puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
+	puts("verilated_vcd_d.o: $(EUVMBINDIR)/../import/esdl/intf/verilator/cpp/verilated_vcd_d.cpp\n\t");
+	puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
+	puts("verilated_d.o: $(EUVMBINDIR)/../import/esdl/intf/verilator/cpp/verilated_d.cpp\n\t");
+	puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
+	puts("include " + topClassName() + ".mk\n");
+        VL_DO_CLEAR(delete m_ofp, m_ofp = nullptr);
+    }
+
     void main(AstNodeModule* modp) {
         m_modp = modp;
         emitHeader(modp);
@@ -840,6 +866,7 @@ class EmitCModel final : public EmitCFunc {
         if (v3Global.opt.euvm()) {
             emitEuvmDFile(modp);
             emitEuvmCFile(modp);
+            emitEuvmMkFile(modp);
         }
         if (v3Global.dpi()) emitDpiExportDispatchers(modp);
     }
