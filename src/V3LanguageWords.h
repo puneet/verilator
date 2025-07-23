@@ -109,7 +109,7 @@ inline void V3LanguageWords::Singleton::init() {
     addKwd("import",                "C++ modules TS keyword");
     addKwd("inline",                "C++ keyword");
     addKwd("int",                   "C++ keyword");
-    addKwd("interrupt",             "C++ common word");
+    // addKwd("interrupt",             "C++ common word");
     addKwd("iterator",              "C++ common word");
     addKwd("long",                  "C++ keyword");
     addKwd("module",                "C++ modules TS keyword");
