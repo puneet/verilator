@@ -662,9 +662,17 @@ class EmitCModel final : public EmitCFunc {
         if (ofp()) closeOutputFile();
     }
 
-    void emitDPionterDecl(const AstVar* nodep) {
-        puts("ubvec!(" + cvtToStr(nodep->widthMin()) + ")* " + nodep->nameProtect().c_str()
-             + ";\n");
+    void emitDPointerDecl(const AstVar* nodep) {
+	std::string arrDims;
+        puts("ubvec!(" + cvtToStr(nodep->widthMin()) + ")");
+
+        for (const AstUnpackArrayDType* arrayp = VN_CAST(nodep->dtypeSkipRefp(), UnpackArrayDType);
+             arrayp; arrayp = VN_CAST(arrayp->subDTypep()->skipRefp(), UnpackArrayDType)) {
+	    std::string dim = ("[" + cvtToStr(arrayp->elementsConst()) + "]");
+	    arrDims.insert(0, dim);
+        }
+	
+	puts(arrDims + "* " + nodep->nameProtect().c_str() + ";\n");
     }
 
     void emitDFunction(const AstVar* nodep) {
@@ -678,8 +686,15 @@ class EmitCModel final : public EmitCFunc {
     }
 
     void emitDVlExports(const AstVar* nodep) {
-        puts("VlExport!(" + cvtToStr(nodep->widthMin()) + ") " + nodep->nameProtect().c_str()
-             + ";\n");
+        puts("VlExport!(" + cvtToStr(nodep->widthMin()));
+        for (const AstUnpackArrayDType* arrayp = VN_CAST(nodep->dtypeSkipRefp(), UnpackArrayDType);
+             arrayp; arrayp = VN_CAST(arrayp->subDTypep()->skipRefp(), UnpackArrayDType)) {
+	    puts(", ");
+	    puts(cvtToStr(arrayp->elementsConst()));
+        }
+	puts(") ");
+	puts(nodep->nameProtect().c_str());
+	puts(";\n");
     }
 
     void emitEuvmDFile(AstNodeModule* modp) {
@@ -709,7 +724,7 @@ class EmitCModel final : public EmitCFunc {
         puts("\n//PORTS \n");
         for (const AstNode* nodep = modp->stmtsp(); nodep; nodep = nodep->nextp()) {
             if (const AstVar* const varp = VN_CAST(nodep, Var)) {
-                if (varp->isPrimaryIO()) { emitDPionterDecl(varp); }
+                if (varp->isPrimaryIO()) { emitDPointerDecl(varp); }
             }
         }
         puts("\n// CELLS\n//Currently unimplemented, using void pointers \n");
