@@ -684,16 +684,16 @@ class EmitCModel final : public EmitCFunc {
     }
 
     void emitDPointerDecl(const AstVar* nodep) {
-	std::string arrDims;
+        std::string arrDims;
         puts("ubvec!(" + cvtToStr(nodep->widthMin()) + ")");
 
         for (const AstUnpackArrayDType* arrayp = VN_CAST(nodep->dtypeSkipRefp(), UnpackArrayDType);
              arrayp; arrayp = VN_CAST(arrayp->subDTypep()->skipRefp(), UnpackArrayDType)) {
-	    std::string dim = ("[" + cvtToStr(arrayp->elementsConst()) + "]");
-	    arrDims.insert(0, dim);
+            std::string dim = ("[" + cvtToStr(arrayp->elementsConst()) + "]");
+            arrDims.insert(0, dim);
         }
-	
-	puts(arrDims + "* " + nodep->nameProtect().c_str() + ";\n");
+
+        puts(arrDims + "* " + nodep->nameProtect().c_str() + ";\n");
     }
 
     void emitDFunction(const AstVar* nodep) {
@@ -710,12 +710,12 @@ class EmitCModel final : public EmitCFunc {
         puts("VlExport!(" + cvtToStr(nodep->widthMin()));
         for (const AstUnpackArrayDType* arrayp = VN_CAST(nodep->dtypeSkipRefp(), UnpackArrayDType);
              arrayp; arrayp = VN_CAST(arrayp->subDTypep()->skipRefp(), UnpackArrayDType)) {
-	    puts(", ");
-	    puts(cvtToStr(arrayp->elementsConst()));
+            puts(", ");
+            puts(cvtToStr(arrayp->elementsConst()));
         }
-	puts(") ");
-	puts(nodep->nameProtect().c_str());
-	puts(";\n");
+        puts(") ");
+        puts(nodep->nameProtect().c_str());
+        puts(";\n");
     }
 
     void emitEuvmDFile(AstNodeModule* modp) {
@@ -877,21 +877,21 @@ class EmitCModel final : public EmitCFunc {
         puts("EUVMBINDIR = $(dir $(shell which ldc2))\n\n");
         puts("D" + topClassName() + ".a: verilated_d.o verilated_vcd_d.o euvm_trace.o \\\n\t");
         puts("verilated.o verilated_vcd_c.o verilated_threads.o \\\n\t");
-        puts(topClassName() + "_euvm_funcs.o " + topClassName() + "_euvm.o " +
-	     topClassName() + "__ALL.a\n\n");
-	puts(topClassName() + "_euvm.o: ../euvm_dir/" +
-	     topClassName() + "_euvm.d\n\t");
-	puts("ldc2 -c -O3 -w $^ -of$@\n\n");
-	puts("euvm_trace.o: $(EUVMBINDIR)/../import/esdl/intf/verilator/trace.d\n\t");
-	puts("ldc2 -c -O3 -w $^ -of$@\n\n");
-	puts(topClassName() + "_euvm_funcs.o: ../euvm_dir/" +
-	     topClassName() + "_euvm_funcs.cpp\n\t");
-	puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
-	puts("verilated_vcd_d.o: $(EUVMBINDIR)/../import/esdl/intf/verilator/cpp/verilated_vcd_d.cpp\n\t");
-	puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
-	puts("verilated_d.o: $(EUVMBINDIR)/../import/esdl/intf/verilator/cpp/verilated_d.cpp\n\t");
-	puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
-	puts("include " + topClassName() + ".mk\n");
+        puts(topClassName() + "_euvm_funcs.o " + topClassName() + "_euvm.o " + topClassName()
+             + "__ALL.a\n\n");
+        puts(topClassName() + "_euvm.o: ../euvm_dir/" + topClassName() + "_euvm.d\n\t");
+        puts("ldc2 -c -O3 -w $^ -of$@\n\n");
+        puts("euvm_trace.o: $(EUVMBINDIR)/../import/esdl/intf/verilator/trace.d\n\t");
+        puts("ldc2 -c -O3 -w $^ -of$@\n\n");
+        puts(topClassName() + "_euvm_funcs.o: ../euvm_dir/" + topClassName()
+             + "_euvm_funcs.cpp\n\t");
+        puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
+        puts("verilated_vcd_d.o: "
+             "$(EUVMBINDIR)/../import/esdl/intf/verilator/cpp/verilated_vcd_d.cpp\n\t");
+        puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
+        puts("verilated_d.o: $(EUVMBINDIR)/../import/esdl/intf/verilator/cpp/verilated_d.cpp\n\t");
+        puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
+        puts("include " + topClassName() + ".mk\n");
         VL_DO_CLEAR(delete m_ofp, m_ofp = nullptr);
     }
 
