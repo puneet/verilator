@@ -1332,6 +1332,10 @@ void V3Options::parseOptsList(FileLine* fl, const string& optdir, int argc,
         m_outFormatOk = true;
         m_euvm = true;
     });
+    DECL_OPTION("-euvm-dir", CbVal, [this](const char* valp) {
+        m_euvmDir = valp;
+        // addIncDirFallback(m_makeDir);  // Need to find generated files there too
+    });
     DECL_OPTION("-comp-limit-blocks", Set, &m_compLimitBlocks).undocumented();
     DECL_OPTION("-comp-limit-members", Set,
                 &m_compLimitMembers)
@@ -2267,6 +2271,7 @@ V3Options::V3Options() {
     m_impp = new V3OptionsImp;
 
     m_makeDir = "obj_dir";
+    m_euvmDir = "euvm_dir";
     m_unusedRegexp = "*unused*";
     m_xAssign = "fast";
     m_xInitial = "unique";
