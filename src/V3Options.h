@@ -293,6 +293,7 @@ private:
     bool m_systemC = false;         // main switch: --sc: System C instead of simple C++
 
     bool m_euvm = false;            // main switch: --euvm: makes Dlang wrapper for the files
+    string m_euvmDir;		    // main switch: --euvm_dir
     
     bool m_stats = false;           // main switch: --stats
     bool m_statsVars = false;       // main switch: --stats-vars
@@ -502,6 +503,7 @@ public:
     bool underlineZero() const { return m_underlineZero; }
     bool systemC() const VL_MT_SAFE { return m_systemC; }
     bool euvm() const { return m_euvm; }
+    string euvmDir() const VL_MT_SAFE { return m_euvmDir; }
     bool savable() const VL_MT_SAFE { return m_savable; }
     VOptionBool schedZeroDelay() const { return m_schedZeroDelay; }
     bool stats() const { return m_stats; }
