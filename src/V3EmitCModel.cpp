@@ -712,7 +712,7 @@ class EmitCModel final : public EmitCFunc {
             "import esdl.intf.verilator.verilated: VlInExport, VlOutExport, VlExport, VlInOutExport;\n";
         if (v3Global.opt.trace())
             of << "import esdl.intf.verilator.trace: VerilatedVcdC, VerilatedTraceBaseC,"
-		    "VerilatedVcdD;\n";
+		    " VerilatedVcdD;\n";
 
         of << "\n//DESCRIPTION: Dlang code to link D classes and functions with the C++ "
 		"classes\n\n";
@@ -749,10 +749,15 @@ class EmitCModel final : public EmitCFunc {
         of << "    final void eval_step();\n";
         of << "    final void eval_end_step();\n";
         // of << "final void final();\n";
+	of << "    final bool eventsPending();\n";
+	of << "    final ulong nextTimeSlot();\n";
 
         if (v3Global.opt.trace()) {
             of << "    final void trace(VerilatedTraceBaseC tfp, int levels, int options = 0) {\n";
             of << "        contextp().trace(tfp, levels, options);\n";
+            of << "    }\n";
+            of << "    final void trace(VerilatedVcdD tfp, int levels, int options = 0) {\n";
+            of << "        contextp().trace(tfp.getTraceBase(), levels, options);\n";
             of << "    }\n";
         }
         // of << "final void trace(VerilatedTraceBaseC tfp, int levels, int options = 0);\n";
@@ -766,6 +771,8 @@ class EmitCModel final : public EmitCFunc {
         of << "    final override char* hierName() const;\n";
         of << "    final override char* modelName() const;\n";
         of << "    final override uint threads() const;\n";
+        of << "    final void prepareClone() const;\n";
+        of << "    final void atClone() const;\n";
         // end of topmost class
         of << "  }\n";
 
@@ -816,7 +823,7 @@ class EmitCModel final : public EmitCFunc {
         of << "  }\n";
         if (v3Global.opt.trace()) {
             of << "  final void trace(VerilatedVcdD tfp, int levels, int options = 0) {\n";
-            of << "    _dut.trace(tfp.getTraceBase(), levels, options);\n";
+            of << "    _dut.trace(tfp, levels, options);\n";
             of << "  }\n";
             of << "  final void trace(VerilatedTraceBaseC tfp, int levels, int options = 0) {\n";
             of << "    _dut.trace(tfp, levels, options);\n";
