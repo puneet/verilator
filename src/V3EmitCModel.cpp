@@ -711,8 +711,10 @@ class EmitCModel final : public EmitCFunc {
 	of <<
             "import esdl.intf.verilator.verilated: VlInExport, VlOutExport, VlExport, VlInOutExport;\n";
         if (v3Global.opt.trace())
-            of << "import esdl.intf.verilator.trace: VerilatedVcdC, VerilatedTraceBaseC,"
-		    " VerilatedVcdD;\n";
+            of << "import esdl.intf.verilator.trace.base: VerilatedTraceBaseC;\n";
+            of << "import esdl.intf.verilator.trace.vcd: VerilatedVcdC, VerilatedVcdD;\n";
+            of << "import esdl.intf.verilator.trace.fst: VerilatedFstC, VerilatedFstD;\n";
+            of << "import esdl.intf.verilator.trace.saif: VerilatedSaifC, VerilatedSaifD;\n";
 
         of << "\n//DESCRIPTION: Dlang code to link D classes and functions with the C++ "
 		"classes\n\n";
@@ -757,6 +759,12 @@ class EmitCModel final : public EmitCFunc {
             of << "        contextp().trace(tfp, levels, options);\n";
             of << "    }\n";
             of << "    final void trace(VerilatedVcdD tfp, int levels, int options = 0) {\n";
+            of << "        contextp().trace(tfp.getTraceBase(), levels, options);\n";
+            of << "    }\n";
+            of << "    final void trace(VerilatedFstD tfp, int levels, int options = 0) {\n";
+            of << "        contextp().trace(tfp.getTraceBase(), levels, options);\n";
+            of << "    }\n";
+            of << "    final void trace(VerilatedSaifD tfp, int levels, int options = 0) {\n";
             of << "        contextp().trace(tfp.getTraceBase(), levels, options);\n";
             of << "    }\n";
         }
@@ -823,6 +831,12 @@ class EmitCModel final : public EmitCFunc {
         of << "  }\n";
         if (v3Global.opt.trace()) {
             of << "  final void trace(VerilatedVcdD tfp, int levels, int options = 0) {\n";
+            of << "    _dut.trace(tfp, levels, options);\n";
+            of << "  }\n";
+            of << "  final void trace(VerilatedFstD tfp, int levels, int options = 0) {\n";
+            of << "    _dut.trace(tfp, levels, options);\n";
+            of << "  }\n";
+            of << "  final void trace(VerilatedSaifD tfp, int levels, int options = 0) {\n";
             of << "    _dut.trace(tfp, levels, options);\n";
             of << "  }\n";
             of << "  final void trace(VerilatedTraceBaseC tfp, int levels, int options = 0) {\n";
