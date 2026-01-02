@@ -869,24 +869,22 @@ class EmitCModel final : public EmitCFunc {
 
     void emitEuvmMkFile(AstNodeModule* modp) {
         V3OutMkFile of{v3Global.opt.makeDir() + "/D" + EmitCUtil::topClassName() + ".mk"};
+	of.puts("include " + EmitCUtil::topClassName() + ".mk\n\n");
         of.puts("EUVMBINDIR = $(dir $(shell which ldc2))\n\n");
-        of.puts("D" + EmitCUtil::topClassName() + ".a: verilated_d.o verilated_vcd_d.o euvm_trace.o \\\n\t");
-        of.puts("verilated.o verilated_vcd_c.o verilated_threads.o \\\n\t");
+        of.puts("D" + EmitCUtil::topClassName() + ".a: verilated.o verilated_d.o verilated_threads.o \\\n\t");
+        if (v3Global.opt.trace()) {
+	    of.puts("verilated_fst_c.o verilated_fst_d.o \\\n\t");
+	    of.puts("verilated_vcd_c.o verilated_vcd_d.o \\\n\t");
+	    of.puts("verilated_saif_c.o verilated_saif_d.o \\\n\t");
+	}
         of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o " + EmitCUtil::topClassName() + "_euvm.o " +
 	     EmitCUtil::topClassName() + "__ALL.a\n\n");
 	of.puts(EmitCUtil::topClassName() + "_euvm.o: ../" + v3Global.opt.euvmDir() + "/" +
 	     EmitCUtil::topClassName() + "_euvm.d\n\t");
 	of.puts("ldc2 -c -O3 -w $^ -of$@\n\n");
-	of.puts("euvm_trace.o: $(EUVMBINDIR)/../import/esdl/intf/verilator/trace.d\n\t");
-	of.puts("ldc2 -c -O3 -w $^ -of$@\n\n");
 	of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o: ../"  + v3Global.opt.euvmDir() + "/" +
 	     EmitCUtil::topClassName() + "_euvm_funcs.cpp\n\t");
 	of.puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
-	of.puts("verilated_vcd_d.o: $(EUVMBINDIR)/../import/esdl/intf/verilator/cpp/verilated_vcd_d.cpp\n\t");
-	of.puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
-	of.puts("verilated_d.o: $(EUVMBINDIR)/../import/esdl/intf/verilator/cpp/verilated_d.cpp\n\t");
-	of.puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
-	of.puts("include " + EmitCUtil::topClassName() + ".mk\n");
     }
 
     void main(AstNodeModule* modp) {
