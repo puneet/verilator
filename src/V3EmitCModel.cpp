@@ -751,7 +751,7 @@ class EmitCModel final : public EmitCFunc {
 
         of << "    ~this();\n";
 
-        of << "    final void eval();\n";
+        // of << "    final void eval();\n";
         of << "    final void eval_step();\n";
         of << "    final void eval_end_step();\n";
         // of << "final void final();\n";
@@ -827,7 +827,13 @@ class EmitCModel final : public EmitCFunc {
         }
         // eval function
         of << "  final void eval() {\n";
-        of << "    _dut.eval();\n";
+        of << "    _dut.eval_step();\n";
+        of << "  }\n";
+        of << "  final void eval_step() {\n";
+        of << "    _dut.eval_step();\n";
+        of << "  }\n";
+        of << "  final void eval_end_step() {\n";
+        of << "    _dut.eval_end_step();\n";
         of << "  }\n";
         // final function, named it finish
         of << "  final void finish() {\n";
