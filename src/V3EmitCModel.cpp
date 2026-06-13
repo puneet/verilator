@@ -965,11 +965,12 @@ class EmitCModel final : public EmitCFunc {
         of.puts("include " + EmitCUtil::topClassName() + ".mk\n\n");
         of.puts("EUVMBINDIR = $(dir $(shell which ldc2))\n\n");
         of.puts("D" + EmitCUtil::topClassName()
-                + ".a: verilated.o verilated_d.o verilated_threads.o verilated_dpi.o \\\n\t");
+                + ".a: verilated.o verilated_d.o verilated_threads.o \\\n\t");
         if (v3Global.opt.trace()) {
             of.puts("verilated_fst_c.o verilated_fst_d.o \\\n\t");
             of.puts("verilated_vcd_c.o verilated_vcd_d.o \\\n\t");
             of.puts("verilated_saif_c.o verilated_saif_d.o \\\n\t");
+            of.puts("verilated_vpi.o verilated_dpi.o \\\n\t");
         }
         of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o " + EmitCUtil::topClassName()
                 + "_euvm.o " + EmitCUtil::topClassName() + "__ALL.a\n\n");
