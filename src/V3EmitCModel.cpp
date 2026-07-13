@@ -974,11 +974,23 @@ class EmitCModel final : public EmitCFunc {
         }
         of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o " + EmitCUtil::topClassName()
                 + "_euvm.o " + EmitCUtil::topClassName() + "__ALL.a\n\n");
-        of.puts(EmitCUtil::topClassName() + "_euvm.o: ../" + v3Global.opt.euvmDir() + "/"
-                + EmitCUtil::topClassName() + "_euvm.d\n\t");
+        if (v3Global.opt.euvmDir()[0] == '/') {
+	    of.puts(EmitCUtil::topClassName() + "_euvm.o: " + v3Global.opt.euvmDir() + "/"
+		    + EmitCUtil::topClassName() + "_euvm.d\n\t");
+	}
+	else {
+	    of.puts(EmitCUtil::topClassName() + "_euvm.o: ../" + v3Global.opt.euvmDir() + "/"
+		    + EmitCUtil::topClassName() + "_euvm.d\n\t");
+	}
         of.puts("ldc2 -c -O3 -w $^ -of$@\n\n");
-        of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o: ../" + v3Global.opt.euvmDir() + "/"
-                + EmitCUtil::topClassName() + "_euvm_funcs.cpp\n\t");
+        if (v3Global.opt.euvmDir()[0] == '/') {
+	    of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o: " + v3Global.opt.euvmDir() + "/"
+		    + EmitCUtil::topClassName() + "_euvm_funcs.cpp\n\t");
+	}
+	else {
+	    of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o: ../" + v3Global.opt.euvmDir() + "/"
+		    + EmitCUtil::topClassName() + "_euvm_funcs.cpp\n\t");
+	}
         of.puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
     }
 
