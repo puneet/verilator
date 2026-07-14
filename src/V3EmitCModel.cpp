@@ -971,6 +971,7 @@ class EmitCModel final : public EmitCFunc {
             of.puts("verilated_vcd_c.o verilated_vcd_d.o \\\n\t");
             of.puts("verilated_saif_c.o verilated_saif_d.o \\\n\t");
             of.puts("verilated_vpi.o verilated_dpi.o \\\n\t");
+            of.puts("liblz4.a \\\n\t");
         }
         of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o " + EmitCUtil::topClassName()
                 + "_euvm.o " + EmitCUtil::topClassName() + "__ALL.a\n\n");
@@ -992,6 +993,16 @@ class EmitCModel final : public EmitCFunc {
 		    + EmitCUtil::topClassName() + "_euvm_funcs.cpp\n\t");
 	}
         of.puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
+	of.puts("liblz4.a:\n");
+	of.puts("\t@SRC_LIB=\"$$(gcc -print-file-name=liblz4.a)\"; \\\n");
+	of.puts("\tif [ \"$$SRC_LIB\" = \"liblz4.a\" ]; then \\\n");
+	of.puts("\t\techo \"==========================================================\"; \\\n");
+	of.puts("\t\techo \"ERROR: liblz4.a is not installed on this system!\";	\\\n");
+	of.puts("\t\techo \"Please install lz4 development packages (e.g., liblz4-dev)\"; \\\n");
+	of.puts("\t\techo \"==========================================================\"; \\\n");
+	of.puts("\t\texit 1; \\\n");
+	of.puts("\tfi; \\\n");
+	of.puts("\tcp -a \"$$SRC_LIB\" $@;\n\n");
     }
 
     void main(AstNodeModule* modp) {
