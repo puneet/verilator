@@ -976,33 +976,31 @@ class EmitCModel final : public EmitCFunc {
         of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o " + EmitCUtil::topClassName()
                 + "_euvm.o " + EmitCUtil::topClassName() + "__ALL.a\n\n");
         if (v3Global.opt.euvmDir()[0] == '/') {
-	    of.puts(EmitCUtil::topClassName() + "_euvm.o: " + v3Global.opt.euvmDir() + "/"
-		    + EmitCUtil::topClassName() + "_euvm.d\n\t");
-	}
-	else {
-	    of.puts(EmitCUtil::topClassName() + "_euvm.o: ../" + v3Global.opt.euvmDir() + "/"
-		    + EmitCUtil::topClassName() + "_euvm.d\n\t");
-	}
+            of.puts(EmitCUtil::topClassName() + "_euvm.o: " + v3Global.opt.euvmDir() + "/"
+                    + EmitCUtil::topClassName() + "_euvm.d\n\t");
+        } else {
+            of.puts(EmitCUtil::topClassName() + "_euvm.o: ../" + v3Global.opt.euvmDir() + "/"
+                    + EmitCUtil::topClassName() + "_euvm.d\n\t");
+        }
         of.puts("ldc2 -c -O3 -w $^ -of$@\n\n");
         if (v3Global.opt.euvmDir()[0] == '/') {
-	    of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o: " + v3Global.opt.euvmDir() + "/"
-		    + EmitCUtil::topClassName() + "_euvm_funcs.cpp\n\t");
-	}
-	else {
-	    of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o: ../" + v3Global.opt.euvmDir() + "/"
-		    + EmitCUtil::topClassName() + "_euvm_funcs.cpp\n\t");
-	}
+            of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o: " + v3Global.opt.euvmDir() + "/"
+                    + EmitCUtil::topClassName() + "_euvm_funcs.cpp\n\t");
+        } else {
+            of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o: ../" + v3Global.opt.euvmDir() + "/"
+                    + EmitCUtil::topClassName() + "_euvm_funcs.cpp\n\t");
+        }
         of.puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
-	of.puts("liblz4.a:\n");
-	of.puts("\t@SRC_LIB=\"$$(gcc -print-file-name=liblz4.a)\"; \\\n");
-	of.puts("\tif [ \"$$SRC_LIB\" = \"liblz4.a\" ]; then \\\n");
-	of.puts("\t\techo \"==========================================================\"; \\\n");
-	of.puts("\t\techo \"ERROR: liblz4.a is not installed on this system!\";	\\\n");
-	of.puts("\t\techo \"Please install lz4 development packages (e.g., liblz4-dev)\"; \\\n");
-	of.puts("\t\techo \"==========================================================\"; \\\n");
-	of.puts("\t\texit 1; \\\n");
-	of.puts("\tfi; \\\n");
-	of.puts("\tcp -a \"$$SRC_LIB\" $@;\n\n");
+        of.puts("liblz4.a:\n");
+        of.puts("\t@SRC_LIB=\"$$(gcc -print-file-name=liblz4.a)\"; \\\n");
+        of.puts("\tif [ \"$$SRC_LIB\" = \"liblz4.a\" ]; then \\\n");
+        of.puts("\t\techo \"==========================================================\"; \\\n");
+        of.puts("\t\techo \"ERROR: liblz4.a is not installed on this system!\";	\\\n");
+        of.puts("\t\techo \"Please install lz4 development packages (e.g., liblz4-dev)\"; \\\n");
+        of.puts("\t\techo \"==========================================================\"; \\\n");
+        of.puts("\t\texit 1; \\\n");
+        of.puts("\tfi; \\\n");
+        of.puts("\tcp -a \"$$SRC_LIB\" $@;\n\n");
     }
 
     void main(AstNodeModule* modp) {
