@@ -965,6 +965,7 @@ class EmitCModel final : public EmitCFunc {
         of.puts("include " + EmitCUtil::topClassName() + ".mk\n\n");
         of.puts("EUVMBINDIR = $(dir $(shell which ldc2))\n\n");
         of.puts("D" + EmitCUtil::topClassName() + ".a: ");
+        const VStringSet& cppFiles = v3Global.opt.cppFiles();
 	for (const string& cppfile : cppFiles) {
 	    const string basename = V3Os::filenameNonDirExt(cppfile);
 	    // NOLINTNEXTLINE(performance-inefficient-string-concatenation)
