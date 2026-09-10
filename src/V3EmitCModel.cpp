@@ -798,10 +798,10 @@ class EmitCModel final : public EmitCFunc {
               "VlInOutExport;\n";
         if (v3Global.opt.trace()) {
             of << "import esdl.intf.verilator.trace.base: VerilatedTraceBaseC;\n";
-	    of << "import esdl.intf.verilator.trace.vcd: VerilatedVcdC, VerilatedVcdD;\n";
-	    of << "import esdl.intf.verilator.trace.fst: VerilatedFstC, VerilatedFstD;\n";
-	    of << "import esdl.intf.verilator.trace.saif: VerilatedSaifC, VerilatedSaifD;\n";
-	}
+            of << "import esdl.intf.verilator.trace.vcd: VerilatedVcdC, VerilatedVcdD;\n";
+            of << "import esdl.intf.verilator.trace.fst: VerilatedFstC, VerilatedFstD;\n";
+            of << "import esdl.intf.verilator.trace.saif: VerilatedSaifC, VerilatedSaifD;\n";
+        }
 
         of << "\n// DESCRIPTION: Dlang code to link D classes and functions with the C++ "
               "classes\n\n";
@@ -856,10 +856,11 @@ class EmitCModel final : public EmitCFunc {
         of << "    void atClone() const;\n";
         // end of topmost class
         of << "  }\n";
-	
+
         // function declarations
         // external constructor for the top class
-        // of << "  " << EmitCUtil::topClassName() + " create_" + EmitCUtil::topClassName() + "();\n";
+        // of << "  " << EmitCUtil::topClassName() + " create_" + EmitCUtil::topClassName() +
+        // "();\n";
         // // of << "void eval(" + EmitCUtil::topClassName() + " obj);\n";
         // of << "  void finalize(" + EmitCUtil::topClassName() + " obj);\n\n";
         // end extern
@@ -885,7 +886,7 @@ class EmitCModel final : public EmitCFunc {
             }
         }
         of << "  }\n";
-	
+
         of << "\n  // Export Declarations \n";
         for (const AstNode* nodep = modp->stmtsp(); nodep; nodep = nodep->nextp()) {
             if (const AstVar* const varp = VN_CAST(nodep, Var)) {
@@ -924,15 +925,15 @@ class EmitCModel final : public EmitCFunc {
             of << "  }\n";
         }
         of << "  final string name() const {\n";
-	of << "    import std.string : fromStringz;\n";
+        of << "    import std.string : fromStringz;\n";
         of << "    return _verilated_dut.name().fromStringz().idup;\n";
         of << "  }\n";
         of << "  final string hierName() const {\n";
-	of << "    import std.string : fromStringz;\n";
+        of << "    import std.string : fromStringz;\n";
         of << "    return _verilated_dut.hierName().fromStringz().idup;\n";
         of << "  }\n";
         of << "  final string modelName() const {\n";
-	of << "    import std.string : fromStringz;\n";
+        of << "    import std.string : fromStringz;\n";
         of << "    return _verilated_dut.modelName().fromStringz().idup;\n";
         of << "  }\n";
         of << "  final uint threads() const {\n";
@@ -944,14 +945,15 @@ class EmitCModel final : public EmitCFunc {
         of << "  final void atClone() const {\n";
         of << "    _verilated_dut.atClone();\n";
         of << "  }\n";
-	
+
         // class end
         of << "}\n";
     }
 
     void emitEuvmCFile(AstNodeModule* modp) {
-        std::ofstream of(v3Global.opt.euvmDir() + "/" + EmitCUtil::topClassName() + "_euvm_wrapper.cpp");
-        of << "#include \""  << EmitCUtil::topClassName() << ".h\"\n\n";
+        std::ofstream of(v3Global.opt.euvmDir() + "/" + EmitCUtil::topClassName()
+                         + "_euvm_wrapper.cpp");
+        of << "#include \"" << EmitCUtil::topClassName() << ".h\"\n\n";
 
         // if (v3Global.opt.trace())
         //     of.puts("#include \"verilated_vcd_d.h\"\n\n");
@@ -962,15 +964,15 @@ class EmitCModel final : public EmitCFunc {
         for (const AstNode* nodep = modp->stmtsp(); nodep; nodep = nodep->nextp()) {
             if (const AstVar* const varp = VN_CAST(nodep, Var)) {
                 if (varp->isPrimaryIO()) {
-		    of << "  void* "<< nodep->nameProtect().c_str() << ";\n";
-		}
+                    of << "  void* " << nodep->nameProtect().c_str() << ";\n";
+                }
             }
         }
 
         of << "\n  " << EmitCUtil::topClassName() << "* verilated_dut;\n\n";
 
-	of << "  void verilated_build();\n\n";
-	
+        of << "  void verilated_build();\n\n";
+
         of << "  void eval();\n";
         of << "  void eval_step();\n";
         of << "  void eval_end_step();\n";
@@ -995,66 +997,70 @@ class EmitCModel final : public EmitCFunc {
         of << "  void atClone() const;\n";
         of << "  };\n\n";
 
-
-	of << "void S" << EmitCUtil::topClassName() << "::verilated_build() {\n";
-	of << "  verilated_dut = new " << EmitCUtil::topClassName() << "();\n\n";
+        of << "void S" << EmitCUtil::topClassName() << "::verilated_build() {\n";
+        of << "  verilated_dut = new " << EmitCUtil::topClassName() << "();\n\n";
 
         for (const AstNode* nodep = modp->stmtsp(); nodep; nodep = nodep->nextp()) {
             if (const AstVar* const varp = VN_CAST(nodep, Var)) {
                 if (varp->isPrimaryIO()) {
-		    of << "  " << nodep->nameProtect().c_str() << " = &(verilated_dut->" <<
-			nodep->nameProtect().c_str() << ");\n";
-		}
+                    of << "  " << nodep->nameProtect().c_str() << " = &(verilated_dut->"
+                       << nodep->nameProtect().c_str() << ");\n";
+                }
             }
         }
-	of << "}\n\n";
+        of << "}\n\n";
 
-	of << "void S" << EmitCUtil::topClassName() << "::eval() { verilated_dut->eval(); }\n";
-	of << "/// Evaluate when calling multiple units/models per time step.\n";
-	of << "void S" << EmitCUtil::topClassName() << "::eval_step()  { verilated_dut->eval_step(); }\n";
-	of << "/// Evaluate at end of a timestep for tracing, when using eval_step().\n";
-	of << "/// Application must call after all eval() and before time changes.\n";
-	of << "void S" << EmitCUtil::topClassName() << "::eval_end_step() { verilated_dut->eval_end_step(); }\n";
-	of << "/// Simulation complete, run final blocks.  Application must call on completion.\n";
-	of << "void S" << EmitCUtil::topClassName() << "::finish() { verilated_dut->final(); }\n";
-	of << "/// Are there scheduled events to handle?\n";
-	of << "bool S" << EmitCUtil::topClassName() << "::eventsPending() { return verilated_dut->eventsPending(); }\n";
-	of << "/// Returns time at next time slot. Aborts if !eventsPending()\n";
-	of << "uint64_t S" << EmitCUtil::topClassName() << "::nextTimeSlot() { return verilated_dut->nextTimeSlot(); }\n";
+        of << "void S" << EmitCUtil::topClassName() << "::eval() { verilated_dut->eval(); }\n";
+        of << "/// Evaluate when calling multiple units/models per time step.\n";
+        of << "void S" << EmitCUtil::topClassName()
+           << "::eval_step()  { verilated_dut->eval_step(); }\n";
+        of << "/// Evaluate at end of a timestep for tracing, when using eval_step().\n";
+        of << "/// Application must call after all eval() and before time changes.\n";
+        of << "void S" << EmitCUtil::topClassName()
+           << "::eval_end_step() { verilated_dut->eval_end_step(); }\n";
+        of << "/// Simulation complete, run final blocks.  Application must call on completion.\n";
+        of << "void S" << EmitCUtil::topClassName() << "::finish() { verilated_dut->final(); }\n";
+        of << "/// Are there scheduled events to handle?\n";
+        of << "bool S" << EmitCUtil::topClassName()
+           << "::eventsPending() { return verilated_dut->eventsPending(); }\n";
+        of << "/// Returns time at next time slot. Aborts if !eventsPending()\n";
+        of << "uint64_t S" << EmitCUtil::topClassName()
+           << "::nextTimeSlot() { return verilated_dut->nextTimeSlot(); }\n";
 
         if (v3Global.opt.trace()) {
-	    of << "/// Trace signals in the model; called by application code\n";
-	    of << "void S" << EmitCUtil::topClassName() << "::trace(VerilatedTraceBaseC* tfp, int levels, int options)\n";
-	    of << "{\n";
-	    of << "  verilated_dut->trace(tfp, levels, options);\n";
-	    of << "}\n";
-	}
-	
-	of << "/// Retrieve name of this model instance (as passed to constructor).\n";
-	of << "const char* S" << EmitCUtil::topClassName() << "::name() const {\n";
-	of << "  return verilated_dut->name();\n";
-	of << "}\n";
+            of << "/// Trace signals in the model; called by application code\n";
+            of << "void S" << EmitCUtil::topClassName()
+               << "::trace(VerilatedTraceBaseC* tfp, int levels, int options)\n";
+            of << "{\n";
+            of << "  verilated_dut->trace(tfp, levels, options);\n";
+            of << "}\n";
+        }
 
-	of << "// Abstract methods from VerilatedModel\n";
-	of << "const char* S" << EmitCUtil::topClassName() << "::hierName() const {\n";
-	of << "  return verilated_dut->hierName();\n";
-	of << "}\n";
-	of << "const char* S" << EmitCUtil::topClassName() << "::modelName() const {\n";
-	of << "  return verilated_dut->modelName();\n";
-	of << "}\n";
-	of << "unsigned S" << EmitCUtil::topClassName() << "::threads() const{\n";
-	of << "  return verilated_dut->threads();\n";
-	of << "}\n";
-	of << "/// Prepare for cloning the model at the process level (e.g. fork in Linux)\n";
-	of << "/// Release necessary resources. Called before cloning.\n";
-	of << "void S" << EmitCUtil::topClassName() << "::prepareClone() const {\n";
-	of << "  return verilated_dut->prepareClone();\n";
-	of << "}\n";
-	of << "/// Re-init after cloning the model at the process level (e.g. fork in Linux)\n";
-	of << "/// Re-allocate necessary resources. Called after cloning.\n";
-	of << "void S" << EmitCUtil::topClassName() << "::atClone() const {\n";
-	of << "  verilated_dut->atClone();\n";
-	of << "}\n";
+        of << "/// Retrieve name of this model instance (as passed to constructor).\n";
+        of << "const char* S" << EmitCUtil::topClassName() << "::name() const {\n";
+        of << "  return verilated_dut->name();\n";
+        of << "}\n";
+
+        of << "// Abstract methods from VerilatedModel\n";
+        of << "const char* S" << EmitCUtil::topClassName() << "::hierName() const {\n";
+        of << "  return verilated_dut->hierName();\n";
+        of << "}\n";
+        of << "const char* S" << EmitCUtil::topClassName() << "::modelName() const {\n";
+        of << "  return verilated_dut->modelName();\n";
+        of << "}\n";
+        of << "unsigned S" << EmitCUtil::topClassName() << "::threads() const{\n";
+        of << "  return verilated_dut->threads();\n";
+        of << "}\n";
+        of << "/// Prepare for cloning the model at the process level (e.g. fork in Linux)\n";
+        of << "/// Release necessary resources. Called before cloning.\n";
+        of << "void S" << EmitCUtil::topClassName() << "::prepareClone() const {\n";
+        of << "  return verilated_dut->prepareClone();\n";
+        of << "}\n";
+        of << "/// Re-init after cloning the model at the process level (e.g. fork in Linux)\n";
+        of << "/// Re-allocate necessary resources. Called after cloning.\n";
+        of << "void S" << EmitCUtil::topClassName() << "::atClone() const {\n";
+        of << "  verilated_dut->atClone();\n";
+        of << "}\n";
     }
 
     void emitEuvmMkFile(AstNodeModule* modp) {
@@ -1063,12 +1069,12 @@ class EmitCModel final : public EmitCFunc {
         of.puts("EUVMBINDIR = $(dir $(shell which ldc2))\n\n");
         of.puts("D" + EmitCUtil::topClassName() + ".a: ");
         const VStringSet& cppFiles = v3Global.opt.cppFiles();
-	for (const string& cppfile : cppFiles) {
-	    const string basename = V3Os::filenameNonDirExt(cppfile);
-	    // NOLINTNEXTLINE(performance-inefficient-string-concatenation)
-	    of.puts(basename + ".o \\\n\t");
-	}
-	of.puts("verilated.o verilated_d.o verilated_threads.o \\\n\t");
+        for (const string& cppfile : cppFiles) {
+            const string basename = V3Os::filenameNonDirExt(cppfile);
+            // NOLINTNEXTLINE(performance-inefficient-string-concatenation)
+            of.puts(basename + ".o \\\n\t");
+        }
+        of.puts("verilated.o verilated_d.o verilated_threads.o \\\n\t");
         if (v3Global.opt.trace()) {
             of.puts("verilated_fst_c.o verilated_fst_d.o \\\n\t");
             of.puts("verilated_vcd_c.o verilated_vcd_d.o \\\n\t");
@@ -1090,8 +1096,8 @@ class EmitCModel final : public EmitCFunc {
             of.puts(EmitCUtil::topClassName() + "_euvm_wrapper.o: " + v3Global.opt.euvmDir() + "/"
                     + EmitCUtil::topClassName() + "_euvm_wrapper.cpp\n\t");
         } else {
-            of.puts(EmitCUtil::topClassName() + "_euvm_wrapper.o: ../" + v3Global.opt.euvmDir() + "/"
-                    + EmitCUtil::topClassName() + "_euvm_wrapper.cpp\n\t");
+            of.puts(EmitCUtil::topClassName() + "_euvm_wrapper.o: ../" + v3Global.opt.euvmDir()
+                    + "/" + EmitCUtil::topClassName() + "_euvm_wrapper.cpp\n\t");
         }
         of.puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
         of.puts("liblz4.a:\n");
