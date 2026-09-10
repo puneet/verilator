@@ -796,109 +796,97 @@ class EmitCModel final : public EmitCFunc {
         of << "import esdl.intf.verilator.verilated: VerilatedContext, VerilatedModel;\n";
         of << "import esdl.intf.verilator.verilated: VlInExport, VlOutExport, VlExport, "
               "VlInOutExport;\n";
-        if (v3Global.opt.trace())
+        if (v3Global.opt.trace()) {
             of << "import esdl.intf.verilator.trace.base: VerilatedTraceBaseC;\n";
-        of << "import esdl.intf.verilator.trace.vcd: VerilatedVcdC, VerilatedVcdD;\n";
-        of << "import esdl.intf.verilator.trace.fst: VerilatedFstC, VerilatedFstD;\n";
-        of << "import esdl.intf.verilator.trace.saif: VerilatedSaifC, VerilatedSaifD;\n";
+	    of << "import esdl.intf.verilator.trace.vcd: VerilatedVcdC, VerilatedVcdD;\n";
+	    of << "import esdl.intf.verilator.trace.fst: VerilatedFstC, VerilatedFstD;\n";
+	    of << "import esdl.intf.verilator.trace.saif: VerilatedSaifC, VerilatedSaifD;\n";
+	}
 
-        of << "\n//DESCRIPTION: Dlang code to link D classes and functions with the C++ "
+        of << "\n// DESCRIPTION: Dlang code to link D classes and functions with the C++ "
               "classes\n\n";
         of << "\n";
 
         of << "extern(C++) {\n";
 
-        of << "  align(8) class " + EmitCUtil::topClassName() + ": VerilatedModel {\n";
-        of << "    //Symbol table, currently unimplemented, using void pointer\n";
-        of << "    void* vlSymsp;\n";
+        of << "  struct S" + EmitCUtil::topClassName() + " {\n";
 
-        of << "\n    //PORTS \n";
+        of << "\n    // PORTS \n";
         for (const AstNode* nodep = modp->stmtsp(); nodep; nodep = nodep->nextp()) {
             if (const AstVar* const varp = VN_CAST(nodep, Var)) {
                 if (varp->isPrimaryIO()) { emitDPointerDecl(of, varp); }
             }
         }
-        of << "\n    // CELLS\n    //Currently unimplemented, using void pointers \n";
-        for (AstNode* nodep = modp->stmtsp(); nodep; nodep = nodep->nextp()) {
-            if (const AstCell* const cellp = VN_CAST(nodep, Cell)) {
-                of << "    void* ";
-                of << cellp->nameProtect();
-                of << ";\n";
-            }
-        }
-        of << "\n    // Root instance pointer, currently unimplemented, using void pointers \n";
-        of << "    void* rootp;\n";
+        of << "\n    // DuT Instance \n";
+        of << "    void* verilated_dut;\n\n";
 
-        of << "    this(VerilatedContext* contextp, const char* name = \"TOP\".ptr);\n";
+        of << "    void verilated_build();\n";
 
-        of << "    ~this();\n";
-
-        // of << "    final void eval();\n";
-        of << "    final void eval_step();\n";
-        of << "    final void eval_end_step();\n";
-        // of << "final void final();\n";
-        of << "    final bool eventsPending();\n";
-        of << "    final ulong nextTimeSlot();\n";
+        of << "    void eval();\n";
+        of << "    void eval_step();\n";
+        of << "    void eval_end_step();\n";
+        of << "    void finish();\n";
+        of << "    bool eventsPending();\n";
+        of << "    ulong nextTimeSlot();\n";
 
         if (v3Global.opt.trace()) {
-            of << "    final void trace(VerilatedTraceBaseC tfp, int levels, int options = 0) {\n";
-            of << "        contextp().trace(tfp, levels, options);\n";
+            of << "    void trace(VerilatedTraceBaseC tfp, int levels, int options = 0);\n\n";
+            of << "    void trace(VerilatedVcdD tfp, int levels, int options = 0) {\n";
+            of << "        this.trace(tfp.getTraceBase(), levels, options);\n";
             of << "    }\n";
-            of << "    final void trace(VerilatedVcdD tfp, int levels, int options = 0) {\n";
-            of << "        contextp().trace(tfp.getTraceBase(), levels, options);\n";
+            of << "    void trace(VerilatedFstD tfp, int levels, int options = 0) {\n";
+            of << "        this.trace(tfp.getTraceBase(), levels, options);\n";
             of << "    }\n";
-            of << "    final void trace(VerilatedFstD tfp, int levels, int options = 0) {\n";
-            of << "        contextp().trace(tfp.getTraceBase(), levels, options);\n";
-            of << "    }\n";
-            of << "    final void trace(VerilatedSaifD tfp, int levels, int options = 0) {\n";
-            of << "        contextp().trace(tfp.getTraceBase(), levels, options);\n";
+            of << "    void trace(VerilatedSaifD tfp, int levels, int options = 0) {\n";
+            of << "        this.trace(tfp.getTraceBase(), levels, options);\n";
             of << "    }\n";
         }
-        // of << "final void trace(VerilatedTraceBaseC tfp, int levels, int options = 0);\n";
+        // of << "void trace(VerilatedTraceBaseC tfp, int levels, int options = 0);\n";
         /// Return current simulation context for this model.
         /// Used to get to e.g. simulation time via contextp()->time()
 
-        // of << "final VerilatedContext* contextp() const;\n";
+        // of << "VerilatedContext* contextp() const;\n";
 
-        of << "    final const(char*) name();\n";
+        of << "    const(char*) name() const;\n";
 
-        of << "    final override char* hierName() const;\n";
-        of << "    final override char* modelName() const;\n";
-        of << "    final override uint threads() const;\n";
-        of << "    final void prepareClone() const;\n";
-        of << "    final void atClone() const;\n";
+        of << "    const(char*) hierName() const;\n";
+        of << "    const(char*) modelName() const;\n";
+        of << "    uint threads() const;\n";
+        of << "    void prepareClone() const;\n";
+        of << "    void atClone() const;\n";
         // end of topmost class
         of << "  }\n";
-
+	
         // function declarations
         // external constructor for the top class
-        of << "  " << EmitCUtil::topClassName() + " create_" + EmitCUtil::topClassName() + "();\n";
-        // of << "void eval(" + EmitCUtil::topClassName() + " obj);\n";
-        of << "  void finalize(" + EmitCUtil::topClassName() + " obj);\n\n";
+        // of << "  " << EmitCUtil::topClassName() + " create_" + EmitCUtil::topClassName() + "();\n";
+        // // of << "void eval(" + EmitCUtil::topClassName() + " obj);\n";
+        // of << "  void finalize(" + EmitCUtil::topClassName() + " obj);\n\n";
         // end extern
         of << "}\n";
 
         // wrapper class definition
         of << "class D" + EmitCUtil::topClassName() + ": Entity {\n";
         // pointer to C++ class
-        of << "  " << EmitCUtil::topClassName() + " _dut;\n\n";
+        of << "  S" << EmitCUtil::topClassName() + " _verilated_dut;\n\n";
         // constructor function
         of << "  this () {\n";
-        of << "    _dut = create_" + EmitCUtil::topClassName() + "();\n";
-        of << "  }\n";
+        of << "    _verilated_dut.verilated_build();\n";
+        of << "  }\n\n";
         of << "  override void doConnect() {\n";
         for (const AstNode* nodep = modp->stmtsp(); nodep; nodep = nodep->nextp()) {
             if (const AstVar* const varp = VN_CAST(nodep, Var)) {
                 if (varp->isPrimaryIO()) {
                     of << "    " << nodep->nameProtect().c_str();
-                    of << "(_dut.";
+                    of << "(_verilated_dut.";
                     of << nodep->nameProtect().c_str();
                     of << ");\n";
                 }
             }
         }
         of << "  }\n";
-        of << "\n  //Functions for Ports \n";
+	
+        of << "\n  // Export Declarations \n";
         for (const AstNode* nodep = modp->stmtsp(); nodep; nodep = nodep->nextp()) {
             if (const AstVar* const varp = VN_CAST(nodep, Var)) {
                 if (varp->isPrimaryIO()) {
@@ -909,55 +897,164 @@ class EmitCModel final : public EmitCFunc {
         }
         // eval function
         of << "  final void eval() {\n";
-        of << "    _dut.eval_step();\n";
+        of << "    _verilated_dut.eval_step();\n";
         of << "  }\n";
         of << "  final void eval_step() {\n";
-        of << "    _dut.eval_step();\n";
+        of << "    _verilated_dut.eval_step();\n";
         of << "  }\n";
         of << "  final void eval_end_step() {\n";
-        of << "    _dut.eval_end_step();\n";
+        of << "    _verilated_dut.eval_end_step();\n";
         of << "  }\n";
         // final function, named it finish
         of << "  final void finish() {\n";
-        of << "    finalize(_dut);\n";
+        of << "    _verilated_dut.finish();\n";
         of << "  }\n";
         if (v3Global.opt.trace()) {
+            of << "  final void trace(VerilatedTraceBaseC tfp, int levels, int options = 0) {\n";
+            of << "    _verilated_dut.trace(tfp, levels, options);\n";
+            of << "  }\n";
             of << "  final void trace(VerilatedVcdD tfp, int levels, int options = 0) {\n";
-            of << "    _dut.trace(tfp, levels, options);\n";
+            of << "    _verilated_dut.trace(tfp, levels, options);\n";
             of << "  }\n";
             of << "  final void trace(VerilatedFstD tfp, int levels, int options = 0) {\n";
-            of << "    _dut.trace(tfp, levels, options);\n";
+            of << "    _verilated_dut.trace(tfp, levels, options);\n";
             of << "  }\n";
             of << "  final void trace(VerilatedSaifD tfp, int levels, int options = 0) {\n";
-            of << "    _dut.trace(tfp, levels, options);\n";
-            of << "  }\n";
-            of << "  final void trace(VerilatedTraceBaseC tfp, int levels, int options = 0) {\n";
-            of << "    _dut.trace(tfp, levels, options);\n";
+            of << "    _verilated_dut.trace(tfp, levels, options);\n";
             of << "  }\n";
         }
+        of << "  final string name() const {\n";
+	of << "    import std.string : fromStringz;\n";
+        of << "    return _verilated_dut.name().fromStringz().idup;\n";
+        of << "  }\n";
+        of << "  final string hierName() const {\n";
+	of << "    import std.string : fromStringz;\n";
+        of << "    return _verilated_dut.hierName().fromStringz().idup;\n";
+        of << "  }\n";
+        of << "  final string modelName() const {\n";
+	of << "    import std.string : fromStringz;\n";
+        of << "    return _verilated_dut.modelName().fromStringz().idup;\n";
+        of << "  }\n";
+        of << "  final uint threads() const {\n";
+        of << "    return _verilated_dut.threads();\n";
+        of << "  }\n";
+        of << "  final void prepareClone() const {\n";
+        of << "    _verilated_dut.prepareClone();\n";
+        of << "  }\n";
+        of << "  final void atClone() const {\n";
+        of << "    _verilated_dut.atClone();\n";
+        of << "  }\n";
+	
         // class end
         of << "}\n";
     }
 
     void emitEuvmCFile(AstNodeModule* modp) {
-        V3OutFile of{v3Global.opt.euvmDir() + "/" + EmitCUtil::topClassName() + "_euvm_funcs.cpp",
-                     V3OutFormatter::LA_C};
-        of.puts("#include \"" + EmitCUtil::topClassName() + ".h\"\n\n");
+        std::ofstream of(v3Global.opt.euvmDir() + "/" + EmitCUtil::topClassName() + "_euvm_wrapper.cpp");
+        of << "#include \""  << EmitCUtil::topClassName() << ".h\"\n\n";
 
         // if (v3Global.opt.trace())
         //     of.puts("#include \"verilated_vcd_d.h\"\n\n");
 
-        of.puts(EmitCUtil::topClassName() + "* create_" + EmitCUtil::topClassName() + "() {\n");
-        of.puts("return new " + EmitCUtil::topClassName() + "();\n");
-        of.puts("}\n");
-        of.puts("\n");
-        of.puts("void eval (" + EmitCUtil::topClassName() + "* obj) {\n");
-        of.puts("obj->eval();\n");
-        of.puts("}\n");
-        of.puts("\n");
-        of.puts("void finalize (" + EmitCUtil::topClassName() + "* obj) {\n");
-        of.puts("obj->final();\n");
-        of.puts("}\n");
+        of << "\nstruct S" << EmitCUtil::topClassName() << "{\n";
+
+        of << "\n  // PORTS \n";
+        for (const AstNode* nodep = modp->stmtsp(); nodep; nodep = nodep->nextp()) {
+            if (const AstVar* const varp = VN_CAST(nodep, Var)) {
+                if (varp->isPrimaryIO()) {
+		    of << "  void* "<< nodep->nameProtect().c_str() << ";\n";
+		}
+            }
+        }
+
+        of << "\n  " << EmitCUtil::topClassName() << "* verilated_dut;\n\n";
+
+	of << "  void verilated_build();\n\n";
+	
+        of << "  void eval();\n";
+        of << "  void eval_step();\n";
+        of << "  void eval_end_step();\n";
+        of << "  void finish();\n";
+        of << "  bool eventsPending();\n";
+        of << "  uint64_t nextTimeSlot();\n";
+
+        if (v3Global.opt.trace()) {
+            of << "  void trace(VerilatedTraceBaseC* tfp, int levels, int options = 0);\n\n";
+        }
+        // of << "void trace(VerilatedTraceBaseC tfp, int levels, int options = 0);\n";
+        /// Return current simulation context for this model.
+        /// Used to get to e.g. simulation time via contextp()->time()
+
+        // of << "VerilatedContext* contextp() const;\n";
+
+        of << "  const char* name() const;\n";
+        of << "  const char* hierName() const;\n";
+        of << "  const char* modelName() const;\n";
+        of << "  unsigned threads() const;\n";
+        of << "  void prepareClone() const;\n";
+        of << "  void atClone() const;\n";
+        of << "  };\n\n";
+
+
+	of << "void S" << EmitCUtil::topClassName() << "::verilated_build() {\n";
+	of << "  verilated_dut = new " << EmitCUtil::topClassName() << "();\n\n";
+
+        for (const AstNode* nodep = modp->stmtsp(); nodep; nodep = nodep->nextp()) {
+            if (const AstVar* const varp = VN_CAST(nodep, Var)) {
+                if (varp->isPrimaryIO()) {
+		    of << "  " << nodep->nameProtect().c_str() << " = &(verilated_dut->" <<
+			nodep->nameProtect().c_str() << ");\n";
+		}
+            }
+        }
+	of << "}\n\n";
+
+	of << "void S" << EmitCUtil::topClassName() << "::eval() { verilated_dut->eval(); }\n";
+	of << "/// Evaluate when calling multiple units/models per time step.\n";
+	of << "void S" << EmitCUtil::topClassName() << "::eval_step()  { verilated_dut->eval_step(); }\n";
+	of << "/// Evaluate at end of a timestep for tracing, when using eval_step().\n";
+	of << "/// Application must call after all eval() and before time changes.\n";
+	of << "void S" << EmitCUtil::topClassName() << "::eval_end_step() { verilated_dut->eval_end_step(); }\n";
+	of << "/// Simulation complete, run final blocks.  Application must call on completion.\n";
+	of << "void S" << EmitCUtil::topClassName() << "::finish() { verilated_dut->final(); }\n";
+	of << "/// Are there scheduled events to handle?\n";
+	of << "bool S" << EmitCUtil::topClassName() << "::eventsPending() { return verilated_dut->eventsPending(); }\n";
+	of << "/// Returns time at next time slot. Aborts if !eventsPending()\n";
+	of << "uint64_t S" << EmitCUtil::topClassName() << "::nextTimeSlot() { return verilated_dut->nextTimeSlot(); }\n";
+
+        if (v3Global.opt.trace()) {
+	    of << "/// Trace signals in the model; called by application code\n";
+	    of << "void S" << EmitCUtil::topClassName() << "::trace(VerilatedTraceBaseC* tfp, int levels, int options)\n";
+	    of << "{\n";
+	    of << "  verilated_dut->trace(tfp, levels, options);\n";
+	    of << "}\n";
+	}
+	
+	of << "/// Retrieve name of this model instance (as passed to constructor).\n";
+	of << "const char* S" << EmitCUtil::topClassName() << "::name() const {\n";
+	of << "  return verilated_dut->name();\n";
+	of << "}\n";
+
+	of << "// Abstract methods from VerilatedModel\n";
+	of << "const char* S" << EmitCUtil::topClassName() << "::hierName() const {\n";
+	of << "  return verilated_dut->hierName();\n";
+	of << "}\n";
+	of << "const char* S" << EmitCUtil::topClassName() << "::modelName() const {\n";
+	of << "  return verilated_dut->modelName();\n";
+	of << "}\n";
+	of << "unsigned S" << EmitCUtil::topClassName() << "::threads() const{\n";
+	of << "  return verilated_dut->threads();\n";
+	of << "}\n";
+	of << "/// Prepare for cloning the model at the process level (e.g. fork in Linux)\n";
+	of << "/// Release necessary resources. Called before cloning.\n";
+	of << "void S" << EmitCUtil::topClassName() << "::prepareClone() const {\n";
+	of << "  return verilated_dut->prepareClone();\n";
+	of << "}\n";
+	of << "/// Re-init after cloning the model at the process level (e.g. fork in Linux)\n";
+	of << "/// Re-allocate necessary resources. Called after cloning.\n";
+	of << "void S" << EmitCUtil::topClassName() << "::atClone() const {\n";
+	of << "  verilated_dut->atClone();\n";
+	of << "}\n";
     }
 
     void emitEuvmMkFile(AstNodeModule* modp) {
@@ -979,7 +1076,7 @@ class EmitCModel final : public EmitCFunc {
             of.puts("verilated_vpi.o verilated_dpi.o \\\n\t");
             of.puts("liblz4.a \\\n\t");
         }
-        of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o " + EmitCUtil::topClassName()
+        of.puts(EmitCUtil::topClassName() + "_euvm_wrapper.o " + EmitCUtil::topClassName()
                 + "_euvm.o " + EmitCUtil::topClassName() + "__ALL.a\n\n");
         if (v3Global.opt.euvmDir()[0] == '/') {
             of.puts(EmitCUtil::topClassName() + "_euvm.o: " + v3Global.opt.euvmDir() + "/"
@@ -990,11 +1087,11 @@ class EmitCModel final : public EmitCFunc {
         }
         of.puts("ldc2 -c -O3 -w $^ -of$@\n\n");
         if (v3Global.opt.euvmDir()[0] == '/') {
-            of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o: " + v3Global.opt.euvmDir() + "/"
-                    + EmitCUtil::topClassName() + "_euvm_funcs.cpp\n\t");
+            of.puts(EmitCUtil::topClassName() + "_euvm_wrapper.o: " + v3Global.opt.euvmDir() + "/"
+                    + EmitCUtil::topClassName() + "_euvm_wrapper.cpp\n\t");
         } else {
-            of.puts(EmitCUtil::topClassName() + "_euvm_funcs.o: ../" + v3Global.opt.euvmDir() + "/"
-                    + EmitCUtil::topClassName() + "_euvm_funcs.cpp\n\t");
+            of.puts(EmitCUtil::topClassName() + "_euvm_wrapper.o: ../" + v3Global.opt.euvmDir() + "/"
+                    + EmitCUtil::topClassName() + "_euvm_wrapper.cpp\n\t");
         }
         of.puts("g++ $(CPPFLAGS) -c -I . -I $(VERILATOR_ROOT)/include $^\n\n");
         of.puts("liblz4.a:\n");
